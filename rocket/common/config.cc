@@ -3,6 +3,9 @@
 
 
 
+// 用于从指定的 XML 节点中读取一个指定名称的子节点，并进行错误处理。
+// 具体来说，它会在指定节点的父节点中查找名为 name 的子节点，并将结果保存到名为 name##_node 的指针变量中。
+// 如果没有找到该节点，则输出一条错误消息并退出程序。
 #define READ_XML_NODE(name, parent) \
 TiXmlElement* name##_node = parent->FirstChildElement(#name); \
 if (!name##_node) { \
@@ -10,8 +13,9 @@ if (!name##_node) { \
   exit(0); \
 } \
 
-
-
+// 用于从指定的 XML 节点中读取一个指定名称的字符串子节点，并进行错误处理。
+// 具体来说，它会在指定节点的父节点中查找名为 name 的子节点，并将结果保存到名为 name##_str 的字符串变量中。
+// 如果没有找到该节点或者该节点的文本内容为空，则输出一条错误消息并退出程序。
 #define READ_STR_FROM_XML_NODE(name, parent) \
   TiXmlElement* name##_node = parent->FirstChildElement(#name); \
   if (!name##_node|| !name##_node->GetText()) { \
@@ -19,7 +23,6 @@ if (!name##_node) { \
     exit(0); \
   } \
   std::string name##_str = std::string(name##_node->GetText()); \
-
 
 
 namespace rocket {
