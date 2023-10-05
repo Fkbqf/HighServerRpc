@@ -1,31 +1,23 @@
-#include <sys/time.h>
+#include "rocket/common/log.h"
+#include "rocket/common/config.h"
+#include "rocket/common/util.h"
 #include <sstream>
 #include <stdio.h>
-#include "rocket/common/log.h"
-#include "rocket/common/util.h"
-#include "rocket/common/config.h"
-
-
-
+#include <sys/time.h>
 
 namespace rocket {
 
-static Logger* g_logger = NULL;
+static Logger *g_logger = NULL;
 
-Logger* Logger::GetGlobalLogger() {
-  return g_logger;
-}
-
+Logger *Logger::GetGlobalLogger() { return g_logger; }
 
 void Logger::InitGlobalLogger() {
 
-  LogLevel global_log_level = StringToLogLevel(Config::GetGlobalConfig()->m_log_level);
+  LogLevel global_log_level =
+      StringToLogLevel(Config::GetGlobalConfig()->m_log_level);
   printf("Init log level [%s]\n", LogLevelToString(global_log_level).c_str());
   g_logger = new Logger(global_log_level);
-
 }
-
-
 
 std::string LogLevelToString(LogLevel level) {
   switch (level) {
@@ -42,8 +34,7 @@ std::string LogLevelToString(LogLevel level) {
   }
 }
 
-
-LogLevel StringToLogLevel(const std::string& log_level) {
+LogLevel StringToLogLevel(const std::string &log_level) {
   if (log_level == "DEBUG") {
     return Debug;
   } else if (log_level == "INFO") {
@@ -69,28 +60,23 @@ std::string LogEvent::toString() {
   int ms = now_time.tv_usec / 1000;
   time_str = time_str + "." + std::to_string(ms);
 
-
   m_pid = getPid();
   m_thread_id = getThreadId();
 
   std::stringstream ss;
 
   ss << "[" << LogLevelToString(m_level) << "]\t"
-    << "[" << time_str << "]\t"
-    << "[" << m_pid << ":" << m_thread_id << "]\t";
-  
+     << "[" << time_str << "]\t"
+     << "[" << m_pid << ":" << m_thread_id << "]\t";
+
   return ss.str();
 }
 
-
-
-void Logger::pushLog(const std::string& msg) {
+void Logger::pushLog(const std::string &msg) {
   ScopeMutext<Mutex> lock(m_mutex);
   m_buffer.push(msg);
   lock.unlock();
-
 }
-
 
 void Logger::log() {
 
@@ -105,7 +91,6 @@ void Logger::log() {
     tmp.pop();
     printf(msg.c_str());
   }
-  
 }
 
-}
+} // namespace rocket

@@ -12,6 +12,7 @@ class ScopeMutext {
  public:
   ScopeMutext(T& mutex) : m_mutex(mutex) {
     m_mutex.lock();
+  
     m_is_lock = true;
   }
 
