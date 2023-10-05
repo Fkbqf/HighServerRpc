@@ -1,13 +1,14 @@
 #include "fd_event.h"
 #include "rocket/common/log.h"
-#include "rocket/net/fd_event.h"
 #include <fcntl.h>
 #include <string.h>
 
 namespace rocket {
-FdEvent::FdEvent(int fd) : m_fd(0) {
+
+FdEvent::FdEvent(int fd) : m_fd(fd) {
   memset(&m_listen_events, 0, sizeof(m_listen_events));
 }
+
 FdEvent::FdEvent() { memset(&m_listen_events, 0, sizeof(m_listen_events)); }
 
 FdEvent::~FdEvent() {}
@@ -41,7 +42,7 @@ void FdEvent::listen(TriggerEvent event_type, std::function<void()> callback,
   m_listen_events.data.ptr = this;
 }
 
-void FdEvent::cancle(TriggerEvent event_type) {
+void FdEvent::cancel(TriggerEvent event_type) {
   if (event_type == TriggerEvent::IN_EVENT) {
     m_listen_events.events &= (~EPOLLIN);
   } else {

@@ -3,15 +3,13 @@
 
 #include <functional>
 #include <sys/epoll.h>
-namespace rocket {
-
 // FdEvent 类
 namespace rocket {
 
 class FdEvent {
 public:
   // 枚举类型，表示可能的触发事件
-  enum TriggerEvent {  
+  enum TriggerEvent {
     IN_EVENT = EPOLLIN,    // 可读事件
     OUT_EVENT = EPOLLOUT,  // 可写事件
     ERROR_EVENT = EPOLLERR // 错误事件
@@ -25,7 +23,7 @@ public:
 
   // 析构函数
   ~FdEvent();
-  
+
   // 设置文件描述符为非阻塞模式
   void setNonBlock();
 
@@ -33,20 +31,17 @@ public:
   std::function<void()> handler(TriggerEvent event_type);
 
   // 监听指定类型的事件，如果事件发生，就调用对应的回调函数
-  void listen(TriggerEvent event_type, std::function<void()> callback, std::function<void()> err_callback=nullptr);
+  void listen(TriggerEvent event_type, std::function<void()> callback,
+              std::function<void()> err_callback = nullptr);
 
   // 取消监听指定类型的事件
   void cancel(TriggerEvent event_type);
 
   // 返回文件描述符
-  int getFd() const {
-    return m_fd;
-  }
+  int getFd() const { return m_fd; }
 
   // 返回 epoll_event 结构
-  epoll_event getEpollEvent() {
-    return m_listen_events;
-  }
+  epoll_event getEpollEvent() { return m_listen_events; }
 
 protected:
   // 文件描述符
