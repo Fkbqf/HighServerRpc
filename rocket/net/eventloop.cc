@@ -18,11 +18,13 @@
     op = EPOLL_CTL_MOD;                                                        \
   }                                                                            \
   epoll_event tmp = event->getEpollEvent();                                    \
+  INFOLOG("epoll_event.events = %d", (int)tmp.events);                         \
   int rt = epoll_ctl(m_epoll_fd, op, event->getFd(), &tmp);                    \
   if (rt == -1) {                                                              \
     ERRORLOG("failed epoll_ctl when add fd,errono=%d,error=%s", errno,         \
              strerror(errno))                                                  \
   }                                                                            \
+  m_listen_fds.insert(event->getFd());                                         \
   DEBUGLOG("add event success,fd[%d]", event->getFd())
 
 #define DELETE_TO_EPOLL()                                                      \
@@ -60,7 +62,7 @@ Eventloop::Eventloop() {
   }
 
   initwakeupfdevent();
-
+  initTimer();
   INFOLOG("succ create event loop int thread %d", m_thread_pid)
 
   t_current_eventloop = this;
@@ -72,6 +74,10 @@ Eventloop::~Eventloop() {
     delete m_wakeup_fd_event;
     m_wakeup_fd_event = NULL;
   }
+  if (m_timer) {
+    delete m_timer;
+    m_timer = NULL;
+  }
 }
 
 void Eventloop::initwakeupfdevent() {
@@ -80,6 +86,7 @@ void Eventloop::initwakeupfdevent() {
     ERRORLOG("failed to eventfd , error info [%d]", errno)
     exit(0);
   }
+    INFOLOG("wakeup fd = %d", m_wakeup_fd);
   m_wakeup_fd_event = new WakeUpFdEvent(m_wakeup_fd);
 
   m_wakeup_fd_event->listen(FdEvent::IN_EVENT, [this]() {
@@ -96,7 +103,7 @@ void Eventloop::loop() {
   while (!m_stop_flag) {
     // 先遍历任务，防止有剩余任务
     ScopeMutext<Mutex> lock(m_mutex);
-    std::queue<std::function<void()>> tmp_tasks ;
+    std::queue<std::function<void()>> tmp_tasks;
     m_pending_tasks.swap(tmp_tasks);
     lock.unlock();
 
@@ -115,7 +122,6 @@ void Eventloop::loop() {
 
     DEBUGLOG("epooll wait start");
     int rt = epoll_wait(m_epoll_fd, result_events, g_epool_max_events, timeout);
-    DEBUGLOG("epooll wait end");
     if (rt < 0) {
       ERRORLOG("epoll_wait error ,errno=%d", errno)
     } else {
@@ -170,8 +176,24 @@ void Eventloop::wakeup() {
 
   m_wakeup_fd_event->wakeup();
 }
-
+void Eventloop::initTimer() {
+  m_timer = new Timer();
+  addEvpollEvent(m_timer);
+}
+void Eventloop::addTimerEvent(TimerEvent::s_ptr event) {
+  m_timer->addTimerEvent(event);
+}
 void Eventloop::stop() { m_stop_flag = true; }
+
+Eventloop*  Eventloop::GetCurrentEventLoop(){
+  if(t_current_eventloop){
+    return t_current_eventloop;
+
+  }
+  t_current_eventloop=new Eventloop();
+  return t_current_eventloop;
+}
+
 
 void Eventloop::dealwakup() {}
 bool Eventloop::isInloopthread() { return getThreadId() == m_thread_pid; }

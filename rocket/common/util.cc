@@ -1,9 +1,9 @@
+#include "rocket/common/util.h"
+#include <memory.h>
+#include <sys/syscall.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <sys/syscall.h>
-#include "rocket/common/util.h"
-
-
 namespace rocket {
 
 static int g_pid = 0;
@@ -24,4 +24,10 @@ pid_t getThreadId() {
   return syscall(SYS_gettid);
 }
 
+int64_t getNoMs() {
+  timeval val;
+  gettimeofday(&val, NULL);
+
+  return val.tv_sec * 1000 + val.tv_usec / 1000;
 }
+} // namespace rocket
