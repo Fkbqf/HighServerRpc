@@ -1,14 +1,25 @@
+#include <memory>
 #include "rocket/common/log.h"
 #include "rocket/net/tcp/net_addr.h"
+#include "rocket/net/tcp/tcp_server.h"
+
+void test_tcp_server() {
+
+  rocket::IpNetAddr::s_ptr addr = std::make_shared<rocket::IpNetAddr>("127.0.0.1", 12346);
+
+  DEBUGLOG("create addr %s", addr->toString().c_str());
+
+  rocket::TcpServer tcp_server(addr);
+
+  tcp_server.start();
+
+}
 
 int main() {
 
-    rocket::Config::SetGlobalConfig(
-      "/home/fyt/workespace/2work/T-ServerPc/conf/rocket.xml");
-
+  rocket::Config::SetGlobalConfig("../conf/rocket.xml");
   rocket::Logger::InitGlobalLogger();
-  rocket::IpNetAddr addr("127.0.0.1:12345");
 
-DEBUGLOG("ip:port %s ",addr.toString().c_str());
-
+  test_tcp_server();
+  
 }

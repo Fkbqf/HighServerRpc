@@ -36,7 +36,7 @@ sockaddr *IpNetAddr::getSockAddr() {
 
 socklen_t IpNetAddr::getSockLen() { return sizeof(m_addr); }
 
-int IpNetAddr::getFamily() { return AF_INET; }
+int IpNetAddr:: getFamily() { return AF_INET; }
 
 std::string IpNetAddr::toString() {
   std::string re;

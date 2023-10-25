@@ -28,7 +28,6 @@ void test_io_thread() {
   inet_aton("127.0.0.1", &addr.sin_addr);
   socklen_t  size=sizeof(addr);
   int rt = bind(listenfd, reinterpret_cast<sockaddr *>(&addr),size);
-  sizeof(addr);
   if (rt != 0) {
     ERRORLOG("bind error");
     exit(1);

@@ -12,6 +12,8 @@ pid_t getThreadId();
 
 int64_t getNoMs();
 
+int32_t getInt32FromNetByte(const char* buf);
+
 }
 
 #endif
