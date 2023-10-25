@@ -1,9 +1,9 @@
-#include "rocket/common/config.h"
-#include "rocket/common/log.h"
-#include "rocket/net/eventloop.h"
-#include "rocket/net/fd_event.h"
-#include "rocket/net/io_thread.h"
-#include "rocket/net/time_event.h"
+#include "hsrpc/common/config.h"
+#include "hsrpc/common/log.h"
+#include "hsrpc/net/eventloop.h"
+#include "hsrpc/net/fd_event.h"
+#include "hsrpc/net/io_thread.h"
+#include "hsrpc/net/time_event.h"
 #include <arpa/inet.h>
 #include <memory>
 #include <netinet/in.h>
@@ -11,7 +11,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include"rocket/net/io_threadgroup.h"
+#include"hsrpc/net/io_threadgroup.h"
 void test_io_thread() {
 
   int listenfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -39,8 +39,8 @@ void test_io_thread() {
     exit(1);
   }
 
-  rocket::FdEvent event(listenfd);
-  event.listen(rocket::FdEvent::IN_EVENT, [listenfd]() {
+  hsrpc::FdEvent event(listenfd);
+  event.listen(hsrpc::FdEvent::IN_EVENT, [listenfd]() {
     sockaddr_in peer_addr;
     socklen_t addr_len = sizeof(peer_addr);
     memset(&peer_addr, 0, sizeof(peer_addr));
@@ -52,10 +52,10 @@ void test_io_thread() {
   });
 
   int i = 0;
-  rocket::TimerEvent::s_ptr timer_event = std::make_shared<rocket::TimerEvent>(
+  hsrpc::TimerEvent::s_ptr timer_event = std::make_shared<hsrpc::TimerEvent>(
       1000, true, [&i]() { INFOLOG("trigger timer event, count=%d", i++); });
 
-  // rocket::IoThtread io_thread;
+  // hsrpc::IoThtread io_thread;
 
   // io_thread.getEventloop()->addEvpollEvent(&event);
   // io_thread.getEventloop()->addTimerEvent(timer_event);
@@ -63,12 +63,12 @@ void test_io_thread() {
 
   // io_thread.join();
 
-  rocket::IOThreadGroup io_thread_group(2);
-  rocket::IoThtread* io_thread = io_thread_group.getIoThread();
+  hsrpc::IOThreadGroup io_thread_group(2);
+  hsrpc::IoThtread* io_thread = io_thread_group.getIoThread();
   // io_thread->getEventLoop()->addEpollEvent(&event);
   io_thread->getEventloop()->addTimerEvent(timer_event);
 
-  rocket::IoThtread* io_thread2 = io_thread_group.getIoThread();
+  hsrpc::IoThtread* io_thread2 = io_thread_group.getIoThread();
   io_thread2->getEventloop()->addTimerEvent(timer_event);
 
   io_thread_group.start();
@@ -78,12 +78,12 @@ void test_io_thread() {
 
 int main() {
 
-  rocket::Config::SetGlobalConfig(
-      "/home/fyt/workespace/2work/T-ServerPc/conf/rocket.xml");
+  hsrpc::Config::SetGlobalConfig(
+      "/home/fyt/workespace/2work/T-ServerPc/conf/hsrpc.xml");
 
-  rocket::Logger::InitGlobalLogger();
+  hsrpc::Logger::InitGlobalLogger();
   test_io_thread();
-  // rocket::Eventloop *eventloop = new rocket::Eventloop();
+  // hsrpc::Eventloop *eventloop = new hsrpc::Eventloop();
 
   // int listenfd = socket(AF_INET, SOCK_STREAM, 0);
   // if (listenfd == -1) {
@@ -110,8 +110,8 @@ int main() {
   //   exit(1);
   // }
 
-  // rocket::FdEvent event(listenfd);
-  // event.listen(rocket::FdEvent::IN_EVENT, [listenfd]() {
+  // hsrpc::FdEvent event(listenfd);
+  // event.listen(hsrpc::FdEvent::IN_EVENT, [listenfd]() {
   //   sockaddr_in peer_addr;
   //   socklen_t addr_len = sizeof(peer_addr);
   //   memset(&peer_addr, 0, sizeof(peer_addr));
@@ -125,8 +125,8 @@ int main() {
   // eventloop->addEvpollEvent(&event);
 
   // // int i = 0;
-  // // rocket::TimerEvent::s_ptr timer_event =
-  // // std::make_shared<rocket::TimerEvent>(
+  // // hsrpc::TimerEvent::s_ptr timer_event =
+  // // std::make_shared<hsrpc::TimerEvent>(
   // //   1000, true, [&i]() {
   // //     INFOLOG("trigger timer event, count=%d", i++);
   // //   }

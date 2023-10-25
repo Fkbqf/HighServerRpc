@@ -8,19 +8,19 @@ PATH_BIN = bin
 PATH_LIB = lib
 PATH_OBJ = obj
 
-PATH_ROCKET = rocket
-PATH_COMM = $(PATH_ROCKET)/common
-PATH_NET = $(PATH_ROCKET)/net
-PATH_TCP = $(PATH_ROCKET)/net/tcp
-PATH_CODER = $(PATH_ROCKET)/net/coder
-PATH_RPC = $(PATH_ROCKET)/net/rpc
+PATH_hsrpc = hsrpc
+PATH_COMM = $(PATH_hsrpc)/common
+PATH_NET = $(PATH_hsrpc)/net
+PATH_TCP = $(PATH_hsrpc)/net/tcp
+PATH_CODER = $(PATH_hsrpc)/net/coder
+PATH_RPC = $(PATH_hsrpc)/net/rpc
 
 PATH_TESTCASES = testcases
 
-# will install lib to /usr/lib/librocket.a
+# will install lib to /usr/lib/libhsrpc.a
 PATH_INSTALL_LIB_ROOT = /usr/lib
 
-# will install all header file to /usr/include/rocket
+# will install all header file to /usr/include/hsrpc
 PATH_INSTALL_INC_ROOT = /usr/include
 
 PATH_INSTALL_INC_COMM = $(PATH_INSTALL_INC_ROOT)/$(PATH_COMM)
@@ -37,7 +37,7 @@ CXX := g++
 
 CXXFLAGS += -g -O0 -std=c++11 -Wall -Wno-deprecated -Wno-unused-but-set-variable
 
-CXXFLAGS += -I./ -I$(PATH_ROCKET)	-I$(PATH_COMM) -I$(PATH_NET) -I$(PATH_TCP) -I$(PATH_CODER) -I$(PATH_RPC)
+CXXFLAGS += -I./ -I$(PATH_hsrpc)	-I$(PATH_COMM) -I$(PATH_NET) -I$(PATH_TCP) -I$(PATH_CODER) -I$(PATH_RPC)
 
 LIBS += /usr/lib/libprotobuf.a	/usr/lib/libtinyxml.a
 
@@ -52,7 +52,7 @@ ALL_TESTS : $(PATH_BIN)/test_log $(PATH_BIN)/test_eventloop $(PATH_BIN)/test_tcp
 
 TEST_CASE_OUT := $(PATH_BIN)/test_log $(PATH_BIN)/test_eventloop $(PATH_BIN)/test_tcp $(PATH_BIN)/test_client  $(PATH_BIN)/test_rpc_client $(PATH_BIN)/test_rpc_server
 
-LIB_OUT := $(PATH_LIB)/librocket.a
+LIB_OUT := $(PATH_LIB)/libhsrpc.a
 
 $(PATH_BIN)/test_log: $(LIB_OUT)
 	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_log.cc -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
@@ -74,7 +74,7 @@ $(PATH_BIN)/test_rpc_server: $(LIB_OUT)
 
 
 $(LIB_OUT): $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ) $(CODER_OBJ) $(RPC_OBJ)
-	cd $(PATH_OBJ) && ar rcv librocket.a *.o && cp librocket.a ../lib/
+	cd $(PATH_OBJ) && ar rcv libhsrpc.a *.o && cp libhsrpc.a ../lib/
 
 $(PATH_OBJ)/%.o : $(PATH_COMM)/%.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -99,7 +99,7 @@ PRINT-% : ; @echo $* = $($*)
 
 # to clean 
 clean :
-	rm -f $(COMM_OBJ) $(NET_OBJ) $(TESTCASES) $(TEST_CASE_OUT) $(PATH_LIB)/librocket.a $(PATH_OBJ)/librocket.a $(PATH_OBJ)/*.o
+	rm -f $(COMM_OBJ) $(NET_OBJ) $(TESTCASES) $(TEST_CASE_OUT) $(PATH_LIB)/libhsrpc.a $(PATH_OBJ)/libhsrpc.a $(PATH_OBJ)/*.o
 
 # install
 install:
@@ -114,4 +114,4 @@ install:
 
 # uninstall
 uninstall:
-	rm -rf $(PATH_INSTALL_INC_ROOT)/ROCKET && rm -f $(PATH_INSTALL_LIB_ROOT)/librocket.a
+	rm -rf $(PATH_INSTALL_INC_ROOT)/hsrpc && rm -f $(PATH_INSTALL_LIB_ROOT)/libhsrpc.a

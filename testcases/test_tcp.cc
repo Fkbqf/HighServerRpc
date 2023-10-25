@@ -1,15 +1,15 @@
 #include <memory>
-#include "rocket/common/log.h"
-#include "rocket/net/tcp/net_addr.h"
-#include "rocket/net/tcp/tcp_server.h"
+#include "hsrpc/common/log.h"
+#include "hsrpc/net/tcp/net_addr.h"
+#include "hsrpc/net/tcp/tcp_server.h"
 
 void test_tcp_server() {
 
-  rocket::IpNetAddr::s_ptr addr = std::make_shared<rocket::IpNetAddr>("127.0.0.1", 12346);
+  hsrpc::IpNetAddr::s_ptr addr = std::make_shared<hsrpc::IpNetAddr>("127.0.0.1", 12346);
 
   DEBUGLOG("create addr %s", addr->toString().c_str());
 
-  rocket::TcpServer tcp_server(addr);
+  hsrpc::TcpServer tcp_server(addr);
 
   tcp_server.start();
 
@@ -17,8 +17,8 @@ void test_tcp_server() {
 
 int main() {
 
-  rocket::Config::SetGlobalConfig("../conf/rocket.xml");
-  rocket::Logger::InitGlobalLogger();
+  hsrpc::Config::SetGlobalConfig("../conf/hsrpc.xml");
+  hsrpc::Logger::InitGlobalLogger();
 
   test_tcp_server();
   

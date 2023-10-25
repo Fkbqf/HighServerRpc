@@ -9,21 +9,21 @@
 #include <memory>
 #include <unistd.h>
 #include <google/protobuf/service.h>
-#include "rocket/common/log.h"
-#include "rocket/common/config.h"
-#include "rocket/common/log.h"
-#include "rocket/net/tcp/tcp.clinet.h"
-#include "rocket/net/tcp/net_addr.h"
-#include "rocket/net/coder/string_coder.h"
-#include "rocket/net/coder/abstact_protocol.h"
-#include "rocket/net/coder/tinypb_coder.h"
-#include "rocket/net/coder/tinypb_protocol.h"
-#include "rocket/net/tcp/net_addr.h"
-#include "rocket/net/tcp/tcp_server.h"
-#include "rocket/net/rpc/rpc_dispatcher.h"
-#include "rocket/net/rpc/rpc_controller.h"
-#include "rocket/net/rpc/rpc_channel.h"
-#include "rocket/net/rpc/rpc_closuer.h"
+#include "hsrpc/common/log.h"
+#include "hsrpc/common/config.h"
+#include "hsrpc/common/log.h"
+#include "hsrpc/net/tcp/tcp.clinet.h"
+#include "hsrpc/net/tcp/net_addr.h"
+#include "hsrpc/net/coder/string_coder.h"
+#include "hsrpc/net/coder/abstact_protocol.h"
+#include "hsrpc/net/coder/tinypb_coder.h"
+#include "hsrpc/net/coder/tinypb_protocol.h"
+#include "hsrpc/net/tcp/net_addr.h"
+#include "hsrpc/net/tcp/tcp_server.h"
+#include "hsrpc/net/rpc/rpc_dispatcher.h"
+#include "hsrpc/net/rpc/rpc_controller.h"
+#include "hsrpc/net/rpc/rpc_channel.h"
+#include "hsrpc/net/rpc/rpc_closuer.h"
 
 #include "order.pb.h"
 
@@ -31,11 +31,11 @@
 
 void test_tcp_client() {
 
-  rocket::IpNetAddr::s_ptr addr = std::make_shared<rocket::IpNetAddr>("127.0.0.1", 12345);
-  rocket::TcpClient client(addr);
+  hsrpc::IpNetAddr::s_ptr addr = std::make_shared<hsrpc::IpNetAddr>("127.0.0.1", 12345);
+  hsrpc::TcpClient client(addr);
   client.connect([addr, &client]() {
     DEBUGLOG("conenct to [%s] success", addr->toString().c_str());
-    std::shared_ptr<rocket::TinyPBProtocol> message = std::make_shared<rocket::TinyPBProtocol>();
+    std::shared_ptr<hsrpc::TinyPBProtocol> message = std::make_shared<hsrpc::TinyPBProtocol>();
     message->m_msg_id = "99998888";
     message->m_pb_data = "test pb data";
 
@@ -50,13 +50,13 @@ void test_tcp_client() {
 
     message->m_method_name = "Order.makeOrder";
 
-    client.writeMessage(message, [request](rocket::AbstractProtocol::s_ptr msg_ptr) {
+    client.writeMessage(message, [request](hsrpc::AbstractProtocol::s_ptr msg_ptr) {
       DEBUGLOG("send message success, request[%s]", request.ShortDebugString().c_str());
     });
 
 
-    client.readMessage("99998888", [](rocket::AbstractProtocol::s_ptr msg_ptr) {
-      std::shared_ptr<rocket::TinyPBProtocol> message = std::dynamic_pointer_cast<rocket::TinyPBProtocol>(msg_ptr);
+    client.readMessage("99998888", [](hsrpc::AbstractProtocol::s_ptr msg_ptr) {
+      std::shared_ptr<hsrpc::TinyPBProtocol> message = std::dynamic_pointer_cast<hsrpc::TinyPBProtocol>(msg_ptr);
       DEBUGLOG("msg_id[%s], get response %s", message->m_msg_id.c_str(), message->m_pb_data.c_str());
       makeOrderResponse response;
 
@@ -85,7 +85,7 @@ void test_rpc_channel() {
   controller->SetMsgId("99998888");
   controller->SetTimeout(10000);
 
-  std::shared_ptr<rocket::RpcClosure> closure = std::make_shared<rocket::RpcClosure>([request, response, channel, controller]() mutable {
+  std::shared_ptr<hsrpc::RpcClosure> closure = std::make_shared<hsrpc::RpcClosure>([request, response, channel, controller]() mutable {
     if (controller->GetErrorCode() == 0) {
       INFOLOG("call rpc success, request[%s], response[%s]", request->ShortDebugString().c_str(), response->ShortDebugString().c_str());
       // 执行业务逻辑
@@ -112,9 +112,9 @@ void test_rpc_channel() {
 
 int main() {
 
-  rocket::Config::SetGlobalConfig(NULL);
+  hsrpc::Config::SetGlobalConfig(NULL);
 
-  rocket::Logger::InitGlobalLogger(0);
+  hsrpc::Logger::InitGlobalLogger(0);
 
   // test_tcp_client();
   test_rpc_channel();

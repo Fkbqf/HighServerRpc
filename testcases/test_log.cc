@@ -1,7 +1,7 @@
 
 #include <pthread.h>
-#include "rocket/common/log.h"
-#include "rocket/common/config.h"
+#include "hsrpc/common/log.h"
+#include "hsrpc/common/config.h"
 
 
 void* fun(void*) {
@@ -17,9 +17,9 @@ void* fun(void*) {
 
 int main() {
 
-  rocket::Config::SetGlobalConfig("../conf/rocket.xml");
+  hsrpc::Config::SetGlobalConfig("../conf/hsrpc.xml");
 
-  rocket::Logger::InitGlobalLogger();
+  hsrpc::Logger::InitGlobalLogger();
 
 
   pthread_t thread;
